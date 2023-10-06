@@ -29,11 +29,11 @@ bool login(vector<User> lista, string name, string pass){
 	return logged;
 };
 
-User* foundUser(vector<User> listaUsuarios, string name){
-	User *u;
+User foundUser(vector<User> listaUsuarios, string name){
+	User u;
 	for(int b = 0;b<listaUsuarios.size();b++){
 		if(listaUsuarios[b].getName() == name){
-			u = &listaUsuarios[b];
+			u = listaUsuarios[b];
 		}
 	}
 	return u;
@@ -176,7 +176,6 @@ int main() {
 	//login
 	bool isLogged = false, isQuit = false;
 	string nombre, contrasena;
-	User *pUser;
 	User user;
 	do
 	{
@@ -190,8 +189,8 @@ int main() {
 			}else{
 				cout<<"Acceso correcto"<<endl;
 				cout<<"Bienvenido "<<nombre<<", Que desea realizar?"<<endl;
-				pUser = foundUser(usuarios, nombre);
-				user = *pUser;
+				user = foundUser(usuarios, nombre);
+				cout<<user.getName()<<" "<<user.getAge()<<" "<<user.getMail()<<" "<<user.getCategory();
 			}
 		}
 		vector<Software> posiblesProgramas;
