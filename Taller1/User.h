@@ -7,11 +7,13 @@
 using namespace std;
 
 class User{
+	
 	private:
 		string name, password, mail, category;
 		int age;
 		int cant;
 		vector<string> softwares;
+
 	public:
 		User(){};
 		User(string name, int age, string mail, string password, string category){
@@ -23,6 +25,7 @@ class User{
 			this->cant = 0;
 			this->softwares = {};
 		};
+
 		string getName(){return this->name;};
 		int getAge(){return this->age;};
 		string getMail(){return this->mail;};
@@ -34,18 +37,44 @@ class User{
 		void changeMail(string newMail){this->mail = newMail;};
 		int getCant(){return this->cant;};
 
-		string getSoft(){
+		string getSoftwares() // obtiene un string con los nombres de los software
+		{
 			string softwares = "";
-			for(int i=0;i<this->getCant();i++){
+			for(int i=0;i<this->cant;i++){
 				softwares += this->softwares[i];
-				if(i != (this->getCant()-1)){softwares += ", ";}
+				if(i != (this->cant-1)){softwares += ", ";}
 			}
 			return softwares;
 		};
 
-		void addSoft(string nameSoft){
-			this->softwares.push_back(nameSoft);
-			this->cant++;
+		int buscarSoftware(string nameSoft) //Busca un nombre de software y retorna su posicion
+		{
+			int pos;
+			for(int i=0;i<this->cant;i++)
+			{
+				if(softwares[i].compare(nameSoft) == 0)
+				{
+					pos = i;
+				}
+			}
+			return pos;
+		}
+
+		void agregarSoftware(string nameSoft) //añade un software mientras no exista antes
+		{
+			if(softwares.empty() || buscarSoftware(nameSoft) == cant-1){
+				this->softwares.push_back(nameSoft);
+				this->cant++;
+			}
+		};
+
+		void borrarSoftware(string nameSoft) // elimina un software
+		{
+			string aux;
+			int pos = buscarSoftware(nameSoft);
+			aux = softwares[cant];
+			softwares[cant] = softwares[pos];
+			softwares[pos] = aux;
+			softwares.pop_back();
 		};
 };
-

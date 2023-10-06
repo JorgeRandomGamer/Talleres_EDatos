@@ -15,7 +15,8 @@
 
 using namespace std;
 
-bool login(vector<User> lista, string name, string pass){
+bool login(vector<User> lista, string name, string pass) //login del usuario
+{
 	bool logged;
 	for(int i=0;i<lista.size();i++){
 		if(lista[i].getName() == name){
@@ -29,7 +30,8 @@ bool login(vector<User> lista, string name, string pass){
 	return logged;
 };
 
-User foundUser(vector<User> listaUsuarios, string name){
+User foundUser(vector<User> listaUsuarios, string name) //busca un usuario por su nombre
+{ 
 	User u;
 	for(int b = 0;b<listaUsuarios.size();b++){
 		if(listaUsuarios[b].getName() == name){
@@ -39,7 +41,8 @@ User foundUser(vector<User> listaUsuarios, string name){
 	return u;
 };
 
-bool isValidProgram(vector<Software>listaSoft, string programa, User u){
+bool isValidProgram(vector<Software>listaSoft, string programa, User u) //detecta que el programa cumpla con el minimo de edad
+{
 	bool valido = false;
 	for(int i=0;i<listaSoft.size();i++){
 		if(listaSoft[i].getName() == programa){
@@ -53,15 +56,16 @@ bool isValidProgram(vector<Software>listaSoft, string programa, User u){
 	return valido;
 }
 
-Software encontrarSoftwarePorNombre(string name, vector<Software> lista){
-			Software s;
-			for(int i=0;i<lista.size();i++){
-				if(lista[i].getName() == name){
-					s = lista[i];
-				}
-			}
-			return s;
+Software encontrarSoftwarePorNombre(string name, vector<Software> lista) //Busca un software por nombre
+{
+	Software s;
+	for(int i=0;i<lista.size();i++){
+		if(lista[i].getName() == name){
+			s = lista[i];
 		}
+	}
+	return s;
+}
 
 int main() {
 	
@@ -72,9 +76,11 @@ int main() {
 	vector<string> malwares = {"Ransomware", "Spyware", "botnets", "rootkits", "gusanos", "troyanos"}; //generos disponibles para clase Malware
 
 	//Poblando Usuarios
+
 	//admin
 	User admin("coke", 19, "coke@gmail.com", "jrg666", "admin");
 	usuarios.push_back(admin);
+
 	//Niños
 	User 
 	nino1("Anais", 17, "", "anais8", "nino"), 
@@ -83,6 +89,7 @@ int main() {
 	nino4("Marcus", 9, "", "marcus123", "nino");
 
 	usuarios.push_back(nino1); usuarios.push_back(nino2); usuarios.push_back(nino3); usuarios.push_back(nino4);
+
 	//Usuarios normales
 	User 
 	nor1("Francisco", 20, "winteroh@ucn.cl", "winteroh", "normal"), 
@@ -99,8 +106,8 @@ int main() {
 	usuarios.push_back(nor1); usuarios.push_back(nor2); usuarios.push_back(nor3); usuarios.push_back(nor4); usuarios.push_back(nor5);
 	usuarios.push_back(nor6); usuarios.push_back(nor7); usuarios.push_back(nor8); usuarios.push_back(nor9); usuarios.push_back(nor10);
 
-
 	//Poblando juegos
+
 	Game 
 	j1("minecraft", "Notch", 10, 17990, "aventura"), 
 	j2("gta", "Rockstar", 18, 20000, "accion"), 
@@ -173,84 +180,76 @@ int main() {
 
 	libreria.push_back(soc1); libreria.push_back(soc2);
 
-	//login
+	
 	bool isLogged = false, isQuit = false;
 	string nombre, contrasena;
 	User user;
 	do
 	{
-		while(!isLogged){
+		while(!isLogged)	//login
+		{
 			cout<<"\nIngrese su nombre: ";cin>>nombre;
 			cout<<"\nIngrese su contrasena: ";cin>>contrasena;
 			isLogged = login(usuarios, nombre, contrasena);
 			
-			if(!isLogged){
+			if(!isLogged)
+			{
 				cout<<"Intente nuevamente"<<endl;
-			}else{
+			}
+			else
+			{
 				cout<<"Acceso correcto"<<endl;
 				cout<<"Bienvenido "<<nombre<<", Que desea realizar?"<<endl;
 				user = foundUser(usuarios, nombre);
-				cout<<user.getName()<<" "<<user.getAge()<<" "<<user.getMail()<<" "<<user.getCategory();
 			}
 		}
-		vector<Software> posiblesProgramas;
-		for(int i=0;i<libreria.size();i++){
-			if(user.getAge() >= libreria[i].getMinAge()){
+		vector<Software> posiblesProgramas; //vector de programas validos para el usuario
+		for(int i=0;i<libreria.size();i++)
+		{
+			if(user.getAge() >= libreria[i].getMinAge())
+			{
 				posiblesProgramas.push_back(libreria[i]);
 			}
 		}
-		string nuevoPrograma = "";
+
+		string nuevoPrograma = "";//variables para el switch
 		int cant=0;
 
-		for(int i=0;i<libreria.size();i++){
-			if(user.getAge() >= libreria[i].getMinAge()){
-				posiblesProgramas.push_back(libreria[i]);
-			}
-		}
+		cout<<"\n\t-Menu-"<<endl; //menu
+		cout<<"1)ver mis programas\n2)ver programas en la base de datos\n3)agregar programa\n0)Logout\n";
 
-		cout<<"\t-Menu-"<<endl;
-		cout<<"1)ver mis programas\n2)ver programas en la base de datos\n3)agregar programa\n4)eliminar programa\n0)Logout\n";
 		int opcion;cin>>opcion;
-		switch(opcion){
-			case 1:
-				if(user.getCant() != 0){
-					cout<<user.getSoft()<<endl;
-				}else{
-					cout<<"No tiene programas agregados\n";
-				}
+
+		switch(opcion)
+		{
+			case 1://muestra los programas agregados
+				if(user.getCant() != 0){cout<<user.getSoftwares()<<endl;}
+				else{cout<<"No tiene programas agregados\n";}
 				break;
-			case 2:
-				for(int j=0;j<posiblesProgramas.size();j++){
-					cout<<posiblesProgramas[j].getName()<<endl;
-				}
+			case 2://muestra los softwares que puede acceder
+				for(int j=0;j<posiblesProgramas.size();j++){cout<<posiblesProgramas[j].getName()<<endl;}
 				break;
-			case 3:
-				cout<<"Ingrese nombre del Programa a agregar: \n";
-				cin>>nuevoPrograma;
-				if(isValidProgram(posiblesProgramas, nuevoPrograma, user)){
-					user.addSoft(nuevoPrograma);
-				}
+			case 3://Agrega un programa a la libreria propia
+				cout<<"Ingrese nombre del Programa a agregar: \n";cin>>nuevoPrograma;
+				if(isValidProgram(posiblesProgramas, nuevoPrograma, user)){user.agregarSoftware(nuevoPrograma);}
 				break;
-			case 5:
-				for(int i=0;i<usuarios.size();i++){
-					cout<<usuarios[i].getName()<<endl;
-				}
-				cout<<usuarios[0].getSoft();
-				
+			case 4://eliminar un programa de la libreria propia
+				break;
+			case 5://añadir un programa a la biblioteca general
+				break;
+			case 6://eliminar un programa de la biblioteca general
 				break;
 			case 0:
 				cout<<"Ha salido Correctamente";
 				isLogged = false;
 				int salir = 0;
-				while(salir<1 || salir>2){
-					cout<<"\nQuiere (1)iniciar sesion con otra cuenta o (2)cerrar el programa?\n";
-					cin>>salir;
+				while(salir<1 || salir>2)
+				{
+					cout<<"\nQuiere (1)iniciar sesion con otra cuenta o (2)cerrar el programa?\n";cin>>salir;
 				}
 				if(salir == 2){isQuit = true;}
 				break;
 		}
 	} while (!isQuit);
-	//g++ main.cpp -o main
-	
 };
 
