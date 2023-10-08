@@ -30,12 +30,12 @@ bool login(vector<User> lista, string name, string pass) //login del usuario
 	return logged;
 };
 
-User foundUser(vector<User> listaUsuarios, string name) //busca un usuario por su nombre
+User* foundUser(vector<User> listaUsuarios, string name) //busca un usuario por su nombre
 { 
-	User u;
+	User *u;
 	for(int b = 0;b<listaUsuarios.size();b++){
 		if(listaUsuarios[b].getName() == name){
-			u = listaUsuarios[b];
+			u = &listaUsuarios[b];
 		}
 	}
 	return u;
@@ -48,11 +48,11 @@ bool isValidProgram(vector<Software>listaSoft, string programa, User u) //detect
 		if(listaSoft[i].getName() == programa){
 			valido = true;
 			listaSoft[i].addUser(u);
-			cout<<"Programa Valido\nPrograma Anadido Correctamente"<<endl;
+			cout<<"Programa Anadido Correctamente"<<endl;
 			break;
 			}
 	}
-	if(!valido){cout<<"Programa no Valido\n";}
+	if(!valido){cout<<"Programa Invalido\n";}
 	return valido;
 }
 
@@ -183,7 +183,7 @@ int main() {
 	
 	bool isLogged = false, isQuit = false;
 	string nombre, contrasena;
-	User user;
+	User *user;
 	do
 	{
 		while(!isLogged)	//login
@@ -199,39 +199,44 @@ int main() {
 			else
 			{
 				cout<<"Acceso correcto"<<endl;
-				cout<<"Bienvenido "<<nombre<<", Que desea realizar?"<<endl;
+				cout<<"Bienvenid@ "<<nombre<<", Que desea realizar?"<<endl;
 				user = foundUser(usuarios, nombre);
 			}
 		}
 		vector<Software> posiblesProgramas; //vector de programas validos para el usuario
 		for(int i=0;i<libreria.size();i++)
 		{
-			if(user.getAge() >= libreria[i].getMinAge())
+			if(user->getAge() >= libreria[i].getMinAge())
 			{
 				posiblesProgramas.push_back(libreria[i]);
 			}
 		}
-
-		string nuevoPrograma = "";//variables para el switch
-		int cant=0;
 
 		cout<<"\n\t-Menu-"<<endl; //menu
 		cout<<"1)ver mis programas\n2)ver programas en la base de datos\n3)agregar programa\n0)Logout\n";
 
 		int opcion;cin>>opcion;
 
+		string nuevoPrograma = "";//variables para el switch
+		int cant=0;
+
 		switch(opcion)
 		{
 			case 1://muestra los programas agregados
-				if(user.getCant() != 0){cout<<user.getSoftwares()<<endl;}
+
+				if(user->getCant() != 0){cout<<user->getSoftwares()<<endl;}
 				else{cout<<"No tiene programas agregados\n";}
 				break;
+
 			case 2://muestra los softwares que puede acceder
+
 				for(int j=0;j<posiblesProgramas.size();j++){cout<<posiblesProgramas[j].getName()<<endl;}
 				break;
+
 			case 3://Agrega un programa a la libreria propia
+
 				cout<<"Ingrese nombre del Programa a agregar: \n";cin>>nuevoPrograma;
-				if(isValidProgram(posiblesProgramas, nuevoPrograma, user)){user.agregarSoftware(nuevoPrograma);}
+				if(isValidProgram(posiblesProgramas, nuevoPrograma, *user/*Arreglar el puntero usuario*/)){user->agregarSoftware(nuevoPrograma);}
 				break;
 			case 4://eliminar un programa de la libreria propia
 				break;
