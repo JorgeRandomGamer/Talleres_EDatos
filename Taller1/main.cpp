@@ -1,8 +1,8 @@
 //Main del programa
 //Jorge Bustos
 
-#include<iostream>
-#include<vector>
+#include <iostream>
+#include <vector>
 
 #include "Software.h"
 #include "User.h"
@@ -30,15 +30,15 @@ bool login(vector<User> lista, string name, string pass) //login del usuario
 	return logged;
 };
 
-User* foundUser(vector<User> listaUsuarios, string name) //busca un usuario por su nombre
+int foundUser(vector<User> listaUsuarios, string name) //busca un usuario por su nombre
 { 
-	User *u;
+	int pos = -1;
 	for(int b = 0;b<listaUsuarios.size();b++){
 		if(listaUsuarios[b].getName() == name){
-			u = &listaUsuarios[b];
+			pos = b;
 		}
 	}
-	return u;
+	return pos;
 };
 
 bool isValidProgram(vector<Software>listaSoft, string programa, User u) //detecta que el programa cumpla con el minimo de edad
@@ -48,7 +48,8 @@ bool isValidProgram(vector<Software>listaSoft, string programa, User u) //detect
 		if(listaSoft[i].getName() == programa){
 			valido = true;
 			listaSoft[i].addUser(u);
-			cout<<"Programa Anadido Correctamente"<<endl;
+			if(u.buscarSoftware(programa) != -1){cout<<"Programa Ya Existe"<<endl;}
+			else{cout<<"Programa Anadido Correctamente"<<endl;}
 			break;
 			}
 	}
@@ -69,11 +70,11 @@ Software encontrarSoftwarePorNombre(string name, vector<Software> lista) //Busca
 
 int main() {
 	
-	vector<Software> libreria; // Se crea la libreria
-	vector<User> usuarios; //Se crea la base de datos de usuarios
-	vector<string> generos = {"Accion", "Aventura", "Plataformas", "RPG", "MMO", "Puzzle", "Deportes", "FPS", "Moba", "Casino"}; //generos disponibles para clase Game
-	vector<string> soluciones = {"video", "musica", "streaming", "fotos"}; //generos disponibles para clase Produccion
-	vector<string> malwares = {"Ransomware", "Spyware", "botnets", "rootkits", "gusanos", "troyanos"}; //generos disponibles para clase Malware
+	vector <Software> libreria; // Se crea la libreria
+	vector <User> usuarios; //Se crea la base de datos de usuarios
+	//vector <string> generos = {"Accion", "Aventura", "Plataformas", "RPG", "MMO", "Puzzle", "Deportes", "FPS", "Moba", "Casino"}; //generos disponibles para clase Game
+	//vector <string> soluciones = {"video", "musica", "streaming", "fotos"}; //generos disponibles para clase Produccion
+	//vector <string> malwares = {"Ransomware", "Spyware", "botnets", "rootkits", "gusanos", "troyanos"}; //generos disponibles para clase Malware
 
 	//Poblando Usuarios
 
@@ -200,7 +201,7 @@ int main() {
 			{
 				cout<<"Acceso correcto"<<endl;
 				cout<<"Bienvenid@ "<<nombre<<", Que desea realizar?"<<endl;
-				user = foundUser(usuarios, nombre);
+				if(foundUser(usuarios, nombre) != -1){user = &usuarios[foundUser(usuarios, nombre)];}
 			}
 		}
 		vector<Software> posiblesProgramas; //vector de programas validos para el usuario
@@ -217,14 +218,15 @@ int main() {
 
 		int opcion;cin>>opcion;
 
-		string nuevoPrograma = "";//variables para el switch
+		string nuevoPrograma, programaAEliminar = "";//variables para el switch
 		int cant=0;
 
 		switch(opcion)
 		{
 			case 1://muestra los programas agregados
 
-				if(user->getCant() != 0){cout<<user->getSoftwares()<<endl;}
+				if(user->getCant() != 0){cout<<user->getSoftwares()<<endl;
+				cout<<user->getCant()<<"Programas\n";}
 				else{cout<<"No tiene programas agregados\n";}
 				break;
 
@@ -236,9 +238,13 @@ int main() {
 			case 3://Agrega un programa a la libreria propia
 
 				cout<<"Ingrese nombre del Programa a agregar: \n";cin>>nuevoPrograma;
-				if(isValidProgram(posiblesProgramas, nuevoPrograma, *user/*Arreglar el puntero usuario*/)){user->agregarSoftware(nuevoPrograma);}
+				if(isValidProgram(libreria, nuevoPrograma, *user)){user->agregarSoftware(nuevoPrograma);}
 				break;
 			case 4://eliminar un programa de la libreria propia
+
+				cout<<"Ingrese el nombre del Programa a eliminar: \n";cin>>programaAEliminar;
+				if(user->borrarSoftware(programaAEliminar)){cout<<"Fue eliminado satisfactoriamente\n";}
+				else{cout<<"no se encontró el programa\n";}
 				break;
 			case 5://añadir un programa a la biblioteca general
 				break;

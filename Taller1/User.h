@@ -22,8 +22,7 @@ class User{
 			this->mail = mail;
 			this->password = password;
 			this->category = category;
-			this->cant = 0;
-			this->softwares = {};
+			this->cant = 0;	
 		};
 
 		string getName(){return this->name;};
@@ -49,7 +48,7 @@ class User{
 
 		int buscarSoftware(string nameSoft) //Busca un nombre de software y retorna su posicion
 		{
-			int pos;
+			int pos = -1;
 			for(int i=0;i<this->cant;i++)
 			{
 				if(softwares[i].compare(nameSoft) == 0)
@@ -62,19 +61,25 @@ class User{
 
 		void agregarSoftware(string nameSoft) //añade un software mientras no exista antes
 		{
-			if(softwares.empty() || buscarSoftware(nameSoft) == cant-1){
+			if(softwares.empty() || buscarSoftware(nameSoft) == -1){
 				this->softwares.push_back(nameSoft);
 				this->cant++;
 			}
 		};
 
-		void borrarSoftware(string nameSoft) // elimina un software
+		bool borrarSoftware(string nameSoft) // elimina un software
 		{
-			string aux;
+			bool esEliminado = false;
 			int pos = buscarSoftware(nameSoft);
-			aux = softwares[cant];
-			softwares[cant] = softwares[pos];
-			softwares[pos] = aux;
-			softwares.pop_back();
+			if(pos != -1)
+			{	
+				string aux = softwares[cant-1];
+				softwares[cant-1] = softwares[pos];
+				softwares[pos] = aux;
+				softwares.pop_back();
+				cant -=1;
+				esEliminado = true;
+			}
+			return esEliminado;
 		};
 };
