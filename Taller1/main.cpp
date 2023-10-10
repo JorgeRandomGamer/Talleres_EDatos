@@ -70,10 +70,7 @@ int main() {
 	
 	vector <Software*> libreria; // Se crea la libreria
 	vector <User> usuarios; //Se crea la base de datos de usuarios
-	//vector <string> generos = {"Accion", "Aventura", "Plataformas", "RPG", "MMO", "Puzzle", "Deportes", "FPS", "Moba", "Casino"}; //generos disponibles para clase Game
-	//vector <string> soluciones = {"video", "musica", "streaming", "fotos"}; //generos disponibles para clase Produccion
-	//vector <string> malwares = {"Ransomware", "Spyware", "botnets", "rootkits", "gusanos", "troyanos"}; //generos disponibles para clase Malware
-
+	
 	//Poblando Usuarios
 
 	//admin
