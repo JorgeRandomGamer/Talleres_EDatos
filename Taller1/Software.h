@@ -16,7 +16,13 @@ class Software{
 		vector<User> listaUsuarios;
 	public:
 		Software(){};
-		Software(string name, string dev, int minAge, double price){this->name = name;this->dev = dev;this->minAge = minAge;this->price = price;};
+		Software(string name, string dev, int minAge, double price)
+		{
+			this->name = name;
+			this->dev = dev;
+			this->minAge = minAge;
+			this->price = price;
+		};
 		string getName(){return this->name;};		
 		string getDev(){return this->dev;};
 		double getPrice(){return this->price;};
@@ -25,18 +31,16 @@ class Software{
 		void setDev(string dev){this->dev = dev;};
 		void setMinAge(int minAge){this->minAge = minAge;};
 		void setPrice(double price){this->price = price;};
-		void changeLog(){this->log = !log;};
 		int getCantUsuarios(){return this->listaUsuarios.size();};
-		string encontrarUsuario(User usuario){
-			string s = "";
-			if(listaUsuarios.size()!= 0){
-				for(int a=0;a<listaUsuarios.size();a++){
-					if(listaUsuarios[a].getName() == usuario.getName()){
-						s = usuario.getName();
-					}
+		void addUser(User u){this->listaUsuarios.push_back(u);}
+		void eliminarUsuario(string nombreUsuario)
+		{
+			for(int i=0;i<listaUsuarios.size();i++)
+			{	
+				if(listaUsuarios[i].getName() == nombreUsuario)
+				{
+					listaUsuarios.erase(listaUsuarios.begin()+i);
 				}
 			}
-			return s;
-		};
-		void addUser(User u){this->listaUsuarios.push_back(u);}
+		}	
 };

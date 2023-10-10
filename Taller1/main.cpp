@@ -41,13 +41,12 @@ int foundUser(vector<User> listaUsuarios, string name) //busca un usuario por su
 	return pos;
 };
 
-bool isValidProgram(vector<Software>listaSoft, string programa, User u) //detecta que el programa cumpla con el minimo de edad
+bool isValidProgram(vector<Software*>listaSoft, string programa, User u) //detecta que el programa cumpla con el minimo de edad
 {
 	bool valido = false;
 	for(int i=0;i<listaSoft.size();i++){
-		if(listaSoft[i].getName() == programa){
+		if(listaSoft[i]->getName() == programa){
 			valido = true;
-			listaSoft[i].addUser(u);
 			if(u.buscarSoftware(programa) != -1){cout<<"Programa Ya Existe"<<endl;}
 			else{cout<<"Programa Anadido Correctamente"<<endl;}
 			break;
@@ -57,20 +56,20 @@ bool isValidProgram(vector<Software>listaSoft, string programa, User u) //detect
 	return valido;
 }
 
-Software encontrarSoftwarePorNombre(string name, vector<Software> lista) //Busca un software por nombre
+int encontrarSoftwarePorNombre(string name, vector<Software*> lista) //Busca un software por nombre
 {
-	Software s;
+	int pos;
 	for(int i=0;i<lista.size();i++){
-		if(lista[i].getName() == name){
-			s = lista[i];
+		if(lista[i]->getName() == name){
+			pos = i;
 		}
 	}
-	return s;
+	return pos;
 }
 
 int main() {
 	
-	vector <Software> libreria; // Se crea la libreria
+	vector <Software*> libreria; // Se crea la libreria
 	vector <User> usuarios; //Se crea la base de datos de usuarios
 	//vector <string> generos = {"Accion", "Aventura", "Plataformas", "RPG", "MMO", "Puzzle", "Deportes", "FPS", "Moba", "Casino"}; //generos disponibles para clase Game
 	//vector <string> soluciones = {"video", "musica", "streaming", "fotos"}; //generos disponibles para clase Produccion
@@ -131,10 +130,10 @@ int main() {
 	j19("Monopoly_Poker", "Ubisoft", 18, 0, "Casino"), 
 	j20("Doom", "Bethesda", 14, 35000, "FPS");
 
-	libreria.push_back(j1); libreria.push_back(j2); libreria.push_back(j3); libreria.push_back(j4); libreria.push_back(j5);
-	libreria.push_back(j6); libreria.push_back(j7); libreria.push_back(j8); libreria.push_back(j9); libreria.push_back(j10);
-	libreria.push_back(j11); libreria.push_back(j12); libreria.push_back(j13); libreria.push_back(j14); libreria.push_back(j15);
-	libreria.push_back(j16); libreria.push_back(j17); libreria.push_back(j18); libreria.push_back(j19); libreria.push_back(j20);
+	libreria.push_back(&j1); libreria.push_back(&j2); libreria.push_back(&j3); libreria.push_back(&j4); libreria.push_back(&j5);
+	libreria.push_back(&j6); libreria.push_back(&j7); libreria.push_back(&j8); libreria.push_back(&j9); libreria.push_back(&j10);
+	libreria.push_back(&j11); libreria.push_back(&j12); libreria.push_back(&j13); libreria.push_back(&j14); libreria.push_back(&j15);
+	libreria.push_back(&j16); libreria.push_back(&j17); libreria.push_back(&j18); libreria.push_back(&j19); libreria.push_back(&j20);
 	
 	//Poblando softwares de Ofimatica
 	Ofimatica
@@ -144,7 +143,7 @@ int main() {
 	of4("Drive", "Google", 14, 0, 50), 
 	of5("DropBox", "DropBox", 14, 0, 17);
 
-	libreria.push_back(of1); libreria.push_back(of2); libreria.push_back(of3); libreria.push_back(of4); libreria.push_back(of5);
+	libreria.push_back(&of1); libreria.push_back(&of2); libreria.push_back(&of3); libreria.push_back(&of4); libreria.push_back(&of5);
 
 	//Poblando softwares de Produccion
 	Produccion
@@ -153,14 +152,14 @@ int main() {
 	pr3("Spotify", "Daniel Ek", 18, 2500, "musica"),
 	pr4("Photos", "Google", 18, 0, "fotos");
 
-	libreria.push_back(pr1); libreria.push_back(pr2); libreria.push_back(pr3); libreria.push_back(pr4);
+	libreria.push_back(&pr1); libreria.push_back(&pr2); libreria.push_back(&pr3); libreria.push_back(&pr4);
 
 	//Poblando softwares Navegadores
 	Navegador
 	nav1("Opera", "Opera", 0, 0), 
 	nav2("Chrome", "Google", 0, 0);
 
-	libreria.push_back(nav1); libreria.push_back(nav2);
+	libreria.push_back(&nav1); libreria.push_back(&nav2);
 
 	//Poblando softwares de Seguridad
 	Seguridad
@@ -171,15 +170,15 @@ int main() {
 	seg5("Security_Essentials", "Microsoft", 13, 0, "gusanos"),
 	seg6("ESET_NOD32", "Miroslav Trnka", 13, 27499, "troyanos");
 
-	libreria.push_back(seg1); libreria.push_back(seg2); libreria.push_back(seg3);
-	libreria.push_back(seg4); libreria.push_back(seg5); libreria.push_back(seg6);
+	libreria.push_back(&seg1); libreria.push_back(&seg2); libreria.push_back(&seg3);
+	libreria.push_back(&seg4); libreria.push_back(&seg5); libreria.push_back(&seg6);
 	
 	//Poblando Softwares sociales
 	Social
 	soc1("Tinder", "Renate Nyborg", 18, 0), 
 	soc2("IAmigos", "Cokke", 10, 0);
 
-	libreria.push_back(soc1); libreria.push_back(soc2);
+	libreria.push_back(&soc1); libreria.push_back(&soc2);
 
 	
 	bool isLogged = false, isQuit = false;
@@ -190,68 +189,81 @@ int main() {
 		while(!isLogged)	//login
 		{
 			cout<<"\nIngrese su nombre: ";cin>>nombre;
-			cout<<"\nIngrese su contrasena: ";cin>>contrasena;
+			cout<<"Ingrese su contrasena: ";cin>>contrasena;
 			isLogged = login(usuarios, nombre, contrasena);
 			
 			if(!isLogged)
 			{
-				cout<<"Intente nuevamente"<<endl;
+				cout<<"\nIntente nuevamente"<<endl;
 			}
 			else
 			{
-				cout<<"Acceso correcto"<<endl;
+				cout<<"\nAcceso correcto"<<endl;
 				cout<<"Bienvenid@ "<<nombre<<", Que desea realizar?"<<endl;
 				if(foundUser(usuarios, nombre) != -1){user = &usuarios[foundUser(usuarios, nombre)];}
 			}
 		}
-		vector<Software> posiblesProgramas; //vector de programas validos para el usuario
-		for(int i=0;i<libreria.size();i++)
-		{
-			if(user->getAge() >= libreria[i].getMinAge())
-			{
-				posiblesProgramas.push_back(libreria[i]);
-			}
-		}
 
 		cout<<"\n\t-Menu-"<<endl; //menu
-		cout<<"1)ver mis programas\n2)ver programas en la base de datos\n3)agregar programa\n0)Logout\n";
+		cout<<"1)ver mis programas\n2)ver programas en la base de datos\n3)agregar programa\n4)eliminar programa\n0)Logout\n"<<endl;
 
 		int opcion;cin>>opcion;
-
+		
 		string nuevoPrograma, programaAEliminar = "";//variables para el switch
-		int cant=0;
+		int posicion;
+		Seguridad *puntSoft; 
 
 		switch(opcion)
 		{
 			case 1://muestra los programas agregados
-
-				if(user->getCant() != 0){cout<<user->getSoftwares()<<endl;
-				cout<<user->getCant()<<"Programas\n";}
+				if(user->getCantSoft() != 0){cout<<user->getSoftwares()<<endl;}
 				else{cout<<"No tiene programas agregados\n";}
 				break;
 
 			case 2://muestra los softwares que puede acceder
 
-				for(int j=0;j<posiblesProgramas.size();j++){cout<<posiblesProgramas[j].getName()<<endl;}
+				for(int j=0;j<libreria.size();j++){
+					if(user->getAge() >= libreria[j]->getMinAge())
+					{
+						if(typeid(*libreria[j]) != typeid(Seguridad)){cout<<libreria[j]->getName()<<endl;}
+						else{
+							cout<<"Es de seguridad\n";
+							if(user->getCategory() == "admin"){cout<<libreria[j]->getName()<<endl;}
+						}
+					}
+				}
 				break;
 
 			case 3://Agrega un programa a la libreria propia
 
 				cout<<"Ingrese nombre del Programa a agregar: \n";cin>>nuevoPrograma;
-				if(isValidProgram(libreria, nuevoPrograma, *user)){user->agregarSoftware(nuevoPrograma);}
+				if(isValidProgram(libreria, nuevoPrograma, *user))
+				{
+					user->agregarSoftware(nuevoPrograma);
+					libreria[encontrarSoftwarePorNombre(nuevoPrograma, libreria)]->addUser(*user);
+				}
 				break;
-			case 4://eliminar un programa de la libreria propia
+
+			case 4://eliminar un programa
 
 				cout<<"Ingrese el nombre del Programa a eliminar: \n";cin>>programaAEliminar;
-				if(user->borrarSoftware(programaAEliminar)){cout<<"Fue eliminado satisfactoriamente\n";}
-				else{cout<<"no se encontró el programa\n";}
+				if(user->borrarSoftware(programaAEliminar))
+				{
+					posicion = encontrarSoftwarePorNombre(programaAEliminar, libreria);
+					Software *eliminado = libreria[posicion];
+					eliminado->eliminarUsuario(nombre);
+					if(eliminado->getCantUsuarios() == 0){cout<<eliminado->getCantUsuarios()<<" USUARIOS, \n";libreria.erase(libreria.begin()+posicion);}
+					cout<<"Fue eliminado satisfactoriamente\n";
+				
+				}
+				else{cout<<"no se encontro el programa\n";}
 				break;
-			case 5://añadir un programa a la biblioteca general
-				break;
-			case 6://eliminar un programa de la biblioteca general
-				break;
+			
+			case 5://ocupar un programa
+
+
 			case 0:
-				cout<<"Ha salido Correctamente";
+				cout<<"\nHa cerrado sesion correctamente";
 				isLogged = false;
 				int salir = 0;
 				while(salir<1 || salir>2)
@@ -262,5 +274,5 @@ int main() {
 				break;
 		}
 	} while (!isQuit);
+	//g++ main.cpp -o main
 };
-
