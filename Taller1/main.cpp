@@ -70,7 +70,7 @@ int main() {
 	
 	vector <Software*> libreria; // Se crea la libreria
 	vector <User> usuarios; //Se crea la base de datos de usuarios
-	
+
 	//Poblando Usuarios
 
 	//admin
@@ -262,5 +262,4 @@ int main() {
 				break;
 		}
 	} while (!isQuit);
-	//g++ main.cpp -o main
 };
