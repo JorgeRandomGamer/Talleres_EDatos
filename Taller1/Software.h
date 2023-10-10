@@ -42,5 +42,5 @@ class Software{
 					listaUsuarios.erase(listaUsuarios.begin()+i);
 				}
 			}
-		}	
+		}
 };

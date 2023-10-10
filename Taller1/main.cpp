@@ -70,7 +70,7 @@ int main() {
 	
 	vector <Software*> libreria; // Se crea la libreria
 	vector <User> usuarios; //Se crea la base de datos de usuarios
-
+	vector <string> softSeguridad;
 	//Poblando Usuarios
 
 	//admin
@@ -168,6 +168,8 @@ int main() {
 
 	libreria.push_back(&seg1); libreria.push_back(&seg2); libreria.push_back(&seg3);
 	libreria.push_back(&seg4); libreria.push_back(&seg5); libreria.push_back(&seg6);
+	softSeguridad.push_back(seg1.getName()); softSeguridad.push_back(seg2.getName()); softSeguridad.push_back(seg3.getName());
+	softSeguridad.push_back(seg4.getName()); softSeguridad.push_back(seg5.getName()); softSeguridad.push_back(seg6.getName());
 	
 	//Poblando Softwares sociales
 	Social
@@ -179,6 +181,7 @@ int main() {
 	
 	bool isLogged = false, isQuit = false;
 	string nombre, contrasena;
+	int salir;
 	User *user;
 	do
 	{
@@ -207,7 +210,7 @@ int main() {
 		
 		string nuevoPrograma, programaAEliminar = "";//variables para el switch
 		int posicion;
-		Seguridad *puntSoft; 
+		bool isSeguridad;
 
 		switch(opcion)
 		{
@@ -220,8 +223,19 @@ int main() {
 
 				for(int j=0;j<libreria.size();j++){
 					if(user->getAge() >= libreria[j]->getMinAge())
-					{
-						cout<<libreria[j]->getName()<<endl;
+					{	
+						
+						isSeguridad = false;
+						for(int k=0;k<softSeguridad.size();k++)
+						{
+							if(softSeguridad[k] == libreria[j]->getName())
+							{
+								isSeguridad = true;
+								
+							}
+						}
+						if(isSeguridad && user->getCategory() == "admin"){cout<<libreria[j]->getName()<<endl;}
+						if(!isSeguridad){cout<<libreria[j]->getName()<<endl;}
 					}
 				}
 				break;
@@ -253,12 +267,15 @@ int main() {
 			case 0:
 				cout<<"\nHa cerrado sesion correctamente";
 				isLogged = false;
-				int salir = 0;
+				salir = 0;
 				while(salir<1 || salir>2)
 				{
 					cout<<"\nQuiere (1)iniciar sesion con otra cuenta o (2)cerrar el programa?\n";cin>>salir;
 				}
 				if(salir == 2){isQuit = true;}
+				break;
+			default:
+				cout<<"Ingrese opcion correcta"<<endl;
 				break;
 		}
 	} while (!isQuit);
