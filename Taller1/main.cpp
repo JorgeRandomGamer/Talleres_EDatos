@@ -3,7 +3,6 @@
 
 #include <iostream>
 #include <vector>
-
 #include "Software.h"
 #include "User.h"
 #include "Juego.h"
@@ -117,7 +116,7 @@ int main() {
 	j6("pokemon_unite", "Nintendo", 10, 0, "moba"),
 	j7("Assasins_Creed", "Ubisoft", 18, 50000, "accion"), 
 	j8("Destiny_2", "Bungie Studios", 16, 50000, "MMO"), 
-	j9("Super_Mario Bros", "bloomCherry", 7, 35000, "Plataformas"),
+	j9("Super_Mario_Bros", "bloomCherry", 7, 35000, "Plataformas"),
 	j10("PokerStars", "Scheinberg", 18, 3990, "Casino"), 
 	j11("Diablo_IV", "Blizzard", 18, 43000, "RPG"), 
 	j12("Geometry_Dash", "RobTop", 9, 4500, "Plataformas"),
@@ -163,19 +162,19 @@ int main() {
 
 	//Poblando softwares de Seguridad
 	Seguridad
-	seg1("Malwarebytes", "Marcin Kleczynski", 13, 10000, "Ransomware"),
-	seg2("Spybot_Search", "Patrick Michael", 13, 50000, "Spyware"),
-	seg3("Norton_Power", "Peter Norton", 13, 16000, "botnets"),
-	seg4("Sophos_Anti-Rootkit", "Kaspersky Lab ", 13, 26785, "fotrootkitsos"),
+	seg1("Malwarebytes", "Marcin_Kleczynski", 13, 10000, "Ransomware"),
+	seg2("Spybot_Search", "Patrick_Michael", 13, 50000, "Spyware"),
+	seg3("Norton_Power", "Peter_Norton", 13, 16000, "botnets"),
+	seg4("Sophos_Anti-Rootkit", "Kaspersky", 13, 26785, "fotrootkitsos"),
 	seg5("Security_Essentials", "Microsoft", 13, 0, "gusanos"),
-	seg6("ESET_NOD32", "Miroslav Trnka", 13, 27499, "troyanos");
+	seg6("ESET_NOD32", "Miroslav_Trnka", 13, 27499, "troyanos");
 
 	libreria.push_back(&seg1); libreria.push_back(&seg2); libreria.push_back(&seg3);
 	libreria.push_back(&seg4); libreria.push_back(&seg5); libreria.push_back(&seg6);
 	
 	//Poblando Softwares sociales
 	Social
-	soc1("Tinder", "Renate Nyborg", 18, 0), 
+	soc1("Tinder", "Nyborg", 18, 0), 
 	soc2("IAmigos", "Cokke", 10, 0);
 
 	libreria.push_back(&soc1); libreria.push_back(&soc2);
@@ -225,11 +224,7 @@ int main() {
 				for(int j=0;j<libreria.size();j++){
 					if(user->getAge() >= libreria[j]->getMinAge())
 					{
-						if(typeid(*libreria[j]) != typeid(Seguridad)){cout<<libreria[j]->getName()<<endl;}
-						else{
-							cout<<"Es de seguridad\n";
-							if(user->getCategory() == "admin"){cout<<libreria[j]->getName()<<endl;}
-						}
+						cout<<libreria[j]->getName()<<endl;
 					}
 				}
 				break;
@@ -258,10 +253,6 @@ int main() {
 				}
 				else{cout<<"no se encontro el programa\n";}
 				break;
-			
-			case 5://ocupar un programa
-
-
 			case 0:
 				cout<<"\nHa cerrado sesion correctamente";
 				isLogged = false;
