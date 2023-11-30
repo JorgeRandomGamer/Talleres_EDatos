@@ -23,7 +23,7 @@ class User{
 			this->password = password;
 			this->category = category;
 			this->cantSoft = 0;	
-			this->cantAmigos = 2;	
+			this->cantAmigos = 0;	
 		};
 
 		string getName(){return this->name;};

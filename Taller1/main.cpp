@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include <vector>
+#include<time.h>
+
 #include "Software.h"
 #include "User.h"
 #include "Juego.h"
@@ -203,6 +205,24 @@ int main() {
 			}
 		}
 
+		if(user->getCantAmigos() == 0)
+		{		
+			srand(time(NULL));
+			for(int i=0;i<2;i++)
+			{
+				int posAmigos = rand()%(usuarios.size());
+				User *ptrAmigo = &usuarios[posAmigos]; 
+				if(user->getAge() < 18 && ptrAmigo->getAge() < 18){user->agregarAmigo(*ptrAmigo);}
+				else{
+					while(user->getAge() <18 && ptrAmigo->getAge() >= 18)
+					{
+					posAmigos = rand()%(usuarios.size());
+					ptrAmigo = &usuarios[posAmigos]; 
+					}
+					user->agregarAmigo(*ptrAmigo);
+				}
+			}
+		}
 		cout<<"\n\t-Menu-"<<endl; //menu
 		cout<<"1)ver mis programas\n2)ver programas en la base de datos\n3)agregar programa\n4)eliminar programa\n0)Logout\n"<<endl;
 
