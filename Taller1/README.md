@@ -1,7 +1,4 @@
-# Talleres_EDatos
-
-Taller1 -> carpeta para archivos del proyecto, en consola usar el comando -pushd Taller1 para acceder a esta carpeta
-Para ejecutar el programa se ocupará el comando "g++ -o main main.cpp"
+# Taller1
 
 Objetos Usuarios:
 Admin1:{usuario:"coke";contraseña:"jrg666";edad:"19";correo:"coke@gmail.com";log:"true").
