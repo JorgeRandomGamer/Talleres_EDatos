@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <climits>
+#include <fstream>
 
 using namespace std;
 
@@ -212,11 +213,74 @@ class Connect4 {
             }
         }
     }
+
+    void guardarPartida(string nombreArchivo) {
+        ofstream archivo(nombreArchivo);
+
+        if(!archivo.is_open()){
+            cout<<"Error al abrir el archivo CSV para guardar la partida"<<endl;
+            return;
+        }
+
+        for(int i = 0; i < filas; i++){
+            for(int j = 0; j < columnas; j++){
+                archivo << tablero[i][j];
+
+                if (j < columnas - 1) {
+                    archivo<<",";
+                }
+            }
+            archivo<<endl;
+        }
+        archivo.close();
+    }
+
+    void guardarPartidas(string nombreArchivo){
+        ofstream archivo(nombreArchivo, ios::app);
+
+        if(!archivo.is_open()){
+            cout<<"Error al abrir el historial."<<endl;
+            return;
+        }
+
+        for(int i = 0; i < filas; i++){
+            for(int j = 0; j < columnas; j++){
+                archivo<<tablero[i][j];
+                if(j < columnas - 1){
+                    archivo<<",";
+                }
+            }
+            archivo<<endl;
+        }
+        archivo<<endl;
+        archivo.close();
+    }
+
+    void cargarPartida(string nombreArchivo) {
+        ifstream archivo(nombreArchivo);
+
+        if(!archivo.is_open()){
+            cout<< "Error al abrir el archivo CSV para cargar la partida"<<endl;
+            return;
+        }
+
+        for(int i = 0; i < filas; i++){
+            for(int j = 0; j < columnas; j++){
+                char valor;
+                archivo>>valor;
+                tablero[i][j] = valor - '0';
+                archivo.ignore();
+            }
+        }
+        archivo.close();
+    }
 };
 
 int main(){
     Connect4 juego;
+    juego.cargarPartida("ultima_partida.csv");  
     int dificultad;
+    bool guardado = false;
     cout<<"\tConnect4\n";
     cout<<"Seleccione dificultad: \n1)Facil\n2)Medio\n3)Dificil\n";cin>>dificultad;
     juego.setDificultad(dificultad);
@@ -232,7 +296,13 @@ int main(){
 
         if(jugadorActual == 1){
             int col;
-            cout<<"Seleccione columna (1-7): ";cin>>col;
+            cout<<"Seleccione columna (1-7): "<<"0 para guardar partida y cerrar"<<endl;cin>>col;
+
+            if(col == 0){
+            juego.guardarPartida("ultima_partida.csv");
+            guardado = true;
+            break;
+            }
 
             while (!juego.hacerMovimiento(col-1, jugadorActual)) {
                 cout<<"Movimiento invalido. Ingrese la columna nuevamente: ";cin>>col;
@@ -245,8 +315,13 @@ int main(){
             break;
         }
     }
-    if(!juego.ganador(1) && !juego.ganador(2)){
+    if(!juego.ganador(1) && !juego.ganador(2) && !guardado){
         cout<<"EMPATE"<<endl;
+    }
+    if(!guardado){
+        juego.guardarPartidas("Partidas.csv");
+        Connect4 fin;
+        fin.guardarPartida("ultima_partida.csv");
     }
     return 0;
 }
