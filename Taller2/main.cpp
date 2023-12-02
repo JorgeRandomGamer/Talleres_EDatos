@@ -9,7 +9,7 @@ const int filas = 6;
 const int columnas = 7;
 int player = 1;
 
-class Connect4 {
+class Connect4{
     private:
     int tablero[filas][columnas];
     int dificultad = 2;
@@ -44,87 +44,87 @@ class Connect4 {
         cout<<endl;
     }
 
-    bool columnaLlena(int col) {
+    bool columnaLlena(int b){
         for(int i=0; i<filas;i++){
-            if(tablero[i][col] == 0){return false;}
+            if(tablero[i][b] == 0){return false;}
         }
         return true;
     }
 
-    bool hacerMovimiento(int col, int jugador){
-        if(col < 0 || col >= columnas || columnaLlena(col)){
+    bool hacerMovimiento(int b, int jugador){
+        if(b < 0 || b >= columnas || columnaLlena(b)){
             return false;
         }
 
         for(int fila = filas - 1; fila >= 0; fila--){
-            if (tablero[fila][col] == 0) {
-                tablero[fila][col] = jugador;
+            if(tablero[fila][b] == 0){
+                tablero[fila][b] = jugador;
                 return true;
             }
         }
         return false;
     }
 
-    bool ganador(int player) {
+    bool ganador(int player){
        // Verificar victoria en horizontal
-        for (int row = 0; row < filas; ++row) {
-            for (int col = 0; col <= columnas - 4; ++col) {
-                bool win = true;
-                for (int i = 0; i < 4; ++i) {
-                    if (tablero[row][col + i] != player) {
-                        win = false;
+        for(int a = 0; a < filas; a++){
+            for(int b = 0; b <= columnas-4; b++){
+                bool conectadas = true;
+                for(int i = 0; i < 4; i++){
+                    if(tablero[a][b + i] != player){
+                        conectadas = false;
                         break;
                     }
                 }
-                if (win) {
+                if(conectadas){
                     return true;
                 }
             }
         }
 
-        // 4 en vertical
-        for (int col = 0; col < columnas; ++col) {
-            for (int row = 0; row <= filas - 4; ++row) {
-                bool win = true;
-                for (int i = 0; i < 4; ++i) {
-                    if (tablero[row + i][col] != player) {
-                        win = false;
+        // Verificar victoria en vertical
+        for(int b = 0; b < columnas; b++){
+            for (int a = 0; a <= filas - 4; a++){
+                bool conectadas = true;
+                for(int i = 0; i < 4; i++){
+                    if(tablero[a + i][b] != player){
+                        conectadas = false;
                         break;
                     }
                 }
-                if (win) {
+                if (conectadas) {
                     return true;
                 }
             }
         }
 
-        // 4 en horizontal
-        for (int row = 4 - 1; row < filas; ++row) {
-            for (int col = 0; col <= columnas - 4; ++col) {
-                bool win = true;
-                for (int i = 0; i < 4; ++i) {
-                    if (tablero[row - i][col + i] != player) {
-                        win = false;
+        // Verificar victoria en diagonal
+        for(int a = 3; a < filas; a++){
+            for(int b = 0; b <= columnas - 4; b++){
+                bool conectadas = true;
+                for(int i = 0; i < 4; i++){
+                    if(tablero[a - i][b + i] != player){
+                        conectadas = false;
                         break;
                     }
                 }
-                if (win) {
+                if(conectadas){
                     return true;
                 }
             }
         }
 
         // 4 en diagonal
-        for (int row = 0; row <= filas - 4; ++row) {
-            for (int col = 0; col <= columnas - 4; ++col) {
-                bool win = true;
-                for (int i = 0; i < 4; ++i) {
-                    if (tablero[row + i][col + i] != player) {
-                        win = false;
+        for(int a = 0; a <= filas - 4; a++){
+            for(int b = 0; b <= columnas - 4; b++){
+                bool conectadas = true;
+                for(int i = 0; i < 4; i++){
+                    if(tablero[a + i][b + i] != player){
+                        conectadas = false;
                         break;
                     }
                 }
-                if (win) {
+                if(conectadas){
                     return true;
                 }
             }
@@ -132,11 +132,11 @@ class Connect4 {
         return false;
     }
 
-    int calcularPuntaje() {
+    int calcularPuntaje(){
         int puntaje = 0;
-        for (int i = 0; i < filas; ++i) {
-            for (int j = 0; j < columnas; ++j) {
-                if (tablero[i][j] == 1) {
+        for (int i = 0; i < filas; i++){
+            for(int j = 0; j < columnas; j++){
+                if(tablero[i][j] == 1){
                     puntaje++;
                 }
             }
@@ -157,10 +157,10 @@ class Connect4 {
         else{mejorPuntaje = INT_MAX;}
 
         // se revisa cada movimiento en el tablero y si la casilla esta vacia se realiza, luego se evalua el puntaje
-        for(int col = 0; col < columnas; col++){
+        for(int b = 0; b < columnas; b++){
             for(int fila = filas - 1; fila >= 0; fila--){
-                if(tablero[fila][col] == 0){
-                    tablero[fila][col] = jugadorActual;
+                if(tablero[fila][b] == 0){
+                    tablero[fila][b] = jugadorActual;
 
                     int puntaje = minimax(3 - jugadorActual, profundidad - 1, alfa, beta);
 
@@ -172,7 +172,7 @@ class Connect4 {
                         beta = min(beta, mejorPuntaje);
                     }
 
-                    tablero[fila][col] = 0;
+                    tablero[fila][b] = 0;
 
                     // Podamos el árbol si beta es menor o igual a alfa.
                     if (beta <= alfa) {
@@ -188,18 +188,18 @@ class Connect4 {
         int mejorPuntaje = INT_MIN;
         int mejorColumna = 0;
     
-        for(int col = 0; col < columnas; col++){
-            if(!columnaLlena(col)){
+        for(int b = 0; b < columnas; b++){
+            if(!columnaLlena(b)){
                 for(int fila = filas - 1; fila >= 0; fila--){
-                    if(tablero[fila][col] == 0){
-                        tablero[fila][col] = 2;
+                    if(tablero[fila][b] == 0){
+                        tablero[fila][b] = 2;
                         
                         int puntaje = minimax(1, dificultad, INT_MIN, INT_MAX);
-                        tablero[fila][col] = 0;
+                        tablero[fila][b] = 0;
     
                         if(puntaje > mejorPuntaje){
                             mejorPuntaje = puntaje;
-                            mejorColumna = col;
+                            mejorColumna = b;
                         }
                         break;
                     }
@@ -214,7 +214,7 @@ class Connect4 {
         }
     }
 
-    void guardarPartida(string nombreArchivo) {
+    void guardarPartida(string nombreArchivo){
         ofstream archivo(nombreArchivo);
 
         if(!archivo.is_open()){
@@ -226,7 +226,7 @@ class Connect4 {
             for(int j = 0; j < columnas; j++){
                 archivo << tablero[i][j];
 
-                if (j < columnas - 1) {
+                if(j < columnas - 1){
                     archivo<<",";
                 }
             }
@@ -256,7 +256,7 @@ class Connect4 {
         archivo.close();
     }
 
-    void cargarPartida(string nombreArchivo) {
+    void cargarPartida(string nombreArchivo){
         ifstream archivo(nombreArchivo);
 
         if(!archivo.is_open()){
@@ -295,17 +295,17 @@ int main(){
         juego.mostrarTablero();
 
         if(jugadorActual == 1){
-            int col;
-            cout<<"Seleccione columna (1-7): "<<"0 para guardar partida y cerrar"<<endl;cin>>col;
+            int b;
+            cout<<"Seleccione bumna (1-7): "<<"0 para guardar partida y cerrar"<<endl;cin>>b;
 
-            if(col == 0){
+            if(b == 0){
             juego.guardarPartida("ultima_partida.csv");
             guardado = true;
             break;
             }
 
-            while (!juego.hacerMovimiento(col-1, jugadorActual)) {
-                cout<<"Movimiento invalido. Ingrese la columna nuevamente: ";cin>>col;
+            while (!juego.hacerMovimiento(b-1, jugadorActual)) {
+                cout<<"Movimiento invalido. Ingrese la bumna nuevamente: ";cin>>b;
             }
         }else{juego.jugar();}
 
