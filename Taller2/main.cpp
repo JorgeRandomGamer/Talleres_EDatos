@@ -24,7 +24,7 @@ class Connect4{
     }
 
     void setDificultad(int dif){
-        dificultad = dif;
+        dificultad = 2*dif-1;
     }
 
     void mostrarTablero(){
@@ -279,10 +279,12 @@ class Connect4{
 int main(){
     Connect4 juego;
     juego.cargarPartida("ultima_partida.csv");  
-    int dificultad;
+    int dificultad = 0;
     bool guardado = false;
     cout<<"\tConnect4\n";
-    cout<<"Seleccione dificultad: \n1)Facil\n2)Medio\n3)Dificil\n";cin>>dificultad;
+    while(dificultad < 1 || dificultad > 3){
+        cout<<"Seleccione dificultad: \n1)Facil\n2)Medio\n3)Dificil\n";cin>>dificultad;
+    }
     juego.setDificultad(dificultad);
 
     for(int i = 0; i < filas * columnas; i++){
@@ -296,7 +298,7 @@ int main(){
 
         if(jugadorActual == 1){
             int b;
-            cout<<"Seleccione bumna (1-7): "<<"0 para guardar partida y cerrar"<<endl;cin>>b;
+            cout<<"Seleccione columna (1-7): "<<"0 para guardar partida y cerrar"<<endl;cin>>b;
 
             if(b == 0){
             juego.guardarPartida("ultima_partida.csv");
@@ -305,7 +307,7 @@ int main(){
             }
 
             while (!juego.hacerMovimiento(b-1, jugadorActual)) {
-                cout<<"Movimiento invalido. Ingrese la bumna nuevamente: ";cin>>b;
+                cout<<"Movimiento invalido. Ingrese la columna nuevamente: ";cin>>b;
             }
         }else{juego.jugar();}
 
