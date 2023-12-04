@@ -15,7 +15,7 @@ class Connect4{
     int dificultad = 2;
 
     public:
-    Connect4(){
+    Connect4(){ //Inicializa un tablero vacio
         for(int i = 0; i < filas; i++){
             for(int j = 0; j < columnas; j++){
                 tablero[i][j] = 0;
@@ -23,11 +23,11 @@ class Connect4{
         }
     }
 
-    void setDificultad(int dif){
+    void setDificultad(int dif){ //Setea la dificultad de la partida
         dificultad = 2*dif-1;
     }
 
-    void mostrarTablero(){
+    void mostrarTablero(){ //Muestra el tablero por pantalla segun el estado de la partida
         for(int i = 0; i < filas; i++){
             for(int j = 0; j < columnas; j++){
                 switch(tablero[i][j]){
@@ -44,14 +44,14 @@ class Connect4{
         cout<<endl;
     }
 
-    bool columnaLlena(int b){
+    bool columnaLlena(int b){ //Verifica si la columna está llena, devuelve true si lo está
         for(int i=0; i<filas;i++){
             if(tablero[i][b] == 0){return false;}
         }
         return true;
     }
 
-    bool hacerMovimiento(int b, int jugador){
+    bool ingresarFicha(int b, int jugador){//Ingresa la ficha a la columna ingresada
         if(b < 0 || b >= columnas || columnaLlena(b)){
             return false;
         }
@@ -65,7 +65,7 @@ class Connect4{
         return false;
     }
 
-    bool ganador(int player){
+    bool ganador(int player){ //Comprueba la victoria del jugador
        // Verificar victoria en horizontal
         for(int a = 0; a < filas; a++){
             for(int b = 0; b <= columnas-4; b++){
@@ -132,11 +132,11 @@ class Connect4{
         return false;
     }
 
-    int calcularPuntaje(){
+    int calcularPuntaje(int jugador){//Calcula el puntaje de la profundidad de los movimientos
         int puntaje = 0;
         for (int i = 0; i < filas; i++){
             for(int j = 0; j < columnas; j++){
-                if(tablero[i][j] == 1){
+                if(tablero[i][j] == jugador){
                     puntaje++;
                 }
             }
@@ -148,7 +148,7 @@ class Connect4{
     int minimax(int jugadorActual, int profundidad, int alfa, int beta){
         // si llega a la maxima profundidad o algun jugador gana, devuelve el puntaje
         if(profundidad == 0 || ganador(1) || ganador(2)) {
-            return calcularPuntaje();
+            return calcularPuntaje(jugadorActual);
         }
         
         // inicializamos el mejor puntaje según el jugador actual.
@@ -184,7 +184,7 @@ class Connect4{
         return mejorPuntaje;
     }
 
-    void jugar() {
+    void jugar(){//Turno de la maquina
         int mejorPuntaje = INT_MIN;
         int mejorColumna = 0;
     
@@ -214,13 +214,8 @@ class Connect4{
         }
     }
 
-    void guardarPartida(string nombreArchivo){
+    void guardarPartida(string nombreArchivo){//Guarda la partida en un archivo
         ofstream archivo(nombreArchivo);
-
-        if(!archivo.is_open()){
-            cout<<"Error al abrir el archivo CSV para guardar la partida"<<endl;
-            return;
-        }
 
         for(int i = 0; i < filas; i++){
             for(int j = 0; j < columnas; j++){
@@ -232,37 +227,12 @@ class Connect4{
             }
             archivo<<endl;
         }
-        archivo.close();
-    }
-
-    void guardarPartidas(string nombreArchivo){
-        ofstream archivo(nombreArchivo, ios::app);
-
-        if(!archivo.is_open()){
-            cout<<"Error al abrir el historial."<<endl;
-            return;
-        }
-
-        for(int i = 0; i < filas; i++){
-            for(int j = 0; j < columnas; j++){
-                archivo<<tablero[i][j];
-                if(j < columnas - 1){
-                    archivo<<",";
-                }
-            }
-            archivo<<endl;
-        }
         archivo<<endl;
         archivo.close();
     }
 
-    void cargarPartida(string nombreArchivo){
+    void cargarPartida(string nombreArchivo){//Carga la partida desde un archivo
         ifstream archivo(nombreArchivo);
-
-        if(!archivo.is_open()){
-            cout<< "Error al abrir el archivo CSV para cargar la partida"<<endl;
-            return;
-        }
 
         for(int i = 0; i < filas; i++){
             for(int j = 0; j < columnas; j++){
@@ -306,7 +276,7 @@ int main(){
             break;
             }
 
-            while (!juego.hacerMovimiento(b-1, jugadorActual)) {
+            while (!juego.ingresarFicha(b-1, jugadorActual)) {
                 cout<<"Movimiento invalido. Ingrese la columna nuevamente: ";cin>>b;
             }
         }else{juego.jugar();}
@@ -321,7 +291,7 @@ int main(){
         cout<<"EMPATE"<<endl;
     }
     if(!guardado){
-        juego.guardarPartidas("Partidas.csv");
+        juego.guardarPartida("Partidas.csv");
         Connect4 fin;
         fin.guardarPartida("ultima_partida.csv");
     }
