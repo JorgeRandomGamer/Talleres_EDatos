@@ -2,28 +2,31 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <limits>
 
 using namespace std;
 
 /*
-El usuario de la plataforma debe entregar el peso del archivo que desea
-enviar (lo que afecta a la velocidad de conexión). Por ejemplo, si desde el
-cliente con id 0 (ver imagen, línea 2) deseo enviar un archivo de 1200 mb,
-entonces el archivo debe ser particionado en 4 partes, debido a que la
-conexión solo acepta 300 mb como máximo.
+El usuario de la plataforma debe entregar el peso del archivo que desea enviar.
+Por ejemplo, si desde el cliente con id 0 deseo enviar un archivo de 1200 mb, 
+entonces el archivo debe ser particionado en 4 partes, debido a que la conexión 
+solo acepta 300 mb como máximo.
+
 La distancia también afecta el tiempo de conexión, ya que entrega la
 información de cuantos segundos se demora en enviar un archivo.
-Siguiendo con el ejemplo anterior, si la misma persona desea enviar el
-archivo de 1200 mb, entonces debe dividirse en 4 partes, cada parte se
-demora 1 segundo en generar la conexión con el router con id 10, por lo
-tanto, solo para que el archivo completo llegue al router, se demorara un
-tiempo total de 4 segundos.
+
+Si la misma persona desea enviar el archivo de 1200 mb, entonces debe dividirse 
+en 4 partes, cada parte se demora 1 segundo en generar la conexión con el router
+con id 10, por lo tanto, solo para que el archivo completo llegue al router, se 
+demorara un tiempo total de 4 segundos.
+
 Usuario además tiene que ser capaz de conocer la ruta que esta tomando el
 archivo y conocer los tiempos entre cada nodo que se comunica.
 */
+
 struct Server{
-    string id,name, type;
-    vector<Server> connections;
+    string id,name,type;
+    vector<pair<Server,pair<int,int>>> connections;
 };
 
 vector<Server> readCsv(string nameScv){
@@ -51,11 +54,12 @@ vector<Server> readCsv(string nameScv){
     return serverList;
 };
 
-void generateConnections(vector<Server> list){
+vector<Server> generateConnections(vector<Server> list){
+    list = readCsv("servidores.csv");
     ifstream file("conexiones.csv");
     if(!file){
         cout<<"the file 'conexiones.csv' hasn't opened"<<endl;
-        return;
+        return list;
     }
     string line; 
     getline(file, line);
@@ -68,21 +72,36 @@ void generateConnections(vector<Server> list){
         getline(ss, speed, ',');
         getline(ss, distance, ',');
         
-        for(Server s : list){
-            cout<<s.name<<endl;
-            if(s.id == idClient){
-                for(Server s2 : list){
-                    cout<<s2.name<<endl;
-                    if(s2.id == idServer){
-                        s.connections.push_back(s2);
+        int sp = stoi(speed);
+        int dist = stoi(distance);
+
+        for (Server &s : list) {
+            if (s.id == idClient) {
+                for (Server &s2 : list) {
+                    if (s2.id == idServer) {
+                        s.connections.push_back(make_pair(s2, make_pair(sp, dist)));
+                        break;
                     }
                 }
+                break;
             }
         }
     }
     file.close();
-}
+    return list;
+};
 
+void bellmanFord(vector<Server*> servers, Server* origin){
+    vector<pair<Server*, pair<Server*,int>>> distancias;
+    for(Server* s : servers){
+        if(s == origin){
+            distancias.push_back(make_pair(origin, make_pair(origin, 0)));
+        } else {
+            int max =INT_MAX;
+            distancias.push_back(make_pair(s, make_pair(origin, max)));
+        }
+    }
+};
 
 void menu(vector<Server> list){
     int option;
@@ -96,10 +115,15 @@ void menu(vector<Server> list){
         switch (option){
         case 1: 
             for(Server s : list){
-                cout<<"Id: "<<s.id<<", Nane: "<<s.name<<endl;
+                cout<<"Id: "<<s.id<<", Name: "<<s.name<<", Type: "<<s.type<<endl;
+                cout<<"Connections: {";
+                for(pair<Server, pair<int,int>> con : s.connections){
+                    cout<<" - "<<con.first.name<<", Speed: "<<con.second.first<<", Distance: "<<con.second.second;
+                }
+                cout<<"}"<<endl;
             }
             break;
-        case 2: generateConnections(list);
+        case 2: break;
         case 0: break;
         }
     }while(option != 0);
@@ -107,15 +131,9 @@ void menu(vector<Server> list){
 
 
 int main(){
-    
-    vector<Server> serverList = readCsv("servidores.csv");
-    generateConnections(serverList);
+    vector<Server> serverList;
+    serverList = generateConnections(serverList);
     menu(serverList);
-    for(Server s : serverList){
-        for(Server s2 : s.connections){
-            cout<<s.name<<"->"<<s2.name<<endl;
-        }
-    }
 
     return 0;
 }
