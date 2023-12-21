@@ -13,7 +13,9 @@
         "vector": "cpp",
         "deque": "cpp",
         "string": "cpp",
-        "fstream": "cpp"
+        "fstream": "cpp",
+        "string_view": "cpp",
+        "initializer_list": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
