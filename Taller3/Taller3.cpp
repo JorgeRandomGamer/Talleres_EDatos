@@ -24,12 +24,18 @@ Usuario además tiene que ser capaz de conocer la ruta que esta tomando el
 archivo y conocer los tiempos entre cada nodo que se comunica.
 */
 
+//Arreglar print
+//Controlar ciclo infinito
+//Dividir en partes
+
 struct Server{
+    //Estructura del server
     string id,name,type;
     vector<pair<Server,pair<int,int>>> connections;
 };
 
 vector<Server> readCsv(string nameScv){
+    //Leer archivos
     vector<Server> serverList;
     ifstream file(nameScv);
     if(!file){
@@ -55,6 +61,7 @@ vector<Server> readCsv(string nameScv){
 };
 
 vector<Server> generateConnections(vector<Server> list){
+    //Generar conexiones 
     list = readCsv("servidores.csv");
     ifstream file("conexiones.csv");
     if(!file){
@@ -92,8 +99,9 @@ vector<Server> generateConnections(vector<Server> list){
 };
 
 void bellmanFord(vector<Server> servers, Server origin){
+    //Algoritmo bellmanFord
     vector<pair<Server, pair<Server,int>>> distancias;
-    cout<<"server: "<<origin.name<<"to ";
+    cout<<"server: "<< origin.name << " " << " to ";
     for(Server s : servers){
         if(s.id == origin.id){
             distancias.push_back(make_pair(origin, make_pair(origin, 0)));
@@ -105,6 +113,7 @@ void bellmanFord(vector<Server> servers, Server origin){
 };
 
 Server searchServer(int id, Server server, vector<Server> list){
+    //Funcion para buscar servers
     for(Server s : list){
         if(id == stoi(s.id)){
             server = s;
@@ -115,6 +124,7 @@ Server searchServer(int id, Server server, vector<Server> list){
 };
 
 void menu(vector<Server> list){
+    //Menu
     int option;
     Server actualServer = list[0];
     Server targetServer;
@@ -129,6 +139,7 @@ void menu(vector<Server> list){
         
         switch (option){
         case 1: 
+            //Opcion ver los servers
             for(Server s : list){
                 cout<<"Id: "<<s.id<<", Name: "<<s.name<<", Type: "<<s.type<<endl;
                 cout<<"Connections: {";
@@ -139,25 +150,29 @@ void menu(vector<Server> list){
             }
             break;
         case 2: 
+            //Mandar archivos
             int size;
             int idTargetServer;
             cout<<"Set the size: ";cin>>size;
             cout<<"Set the target ID to send the file: ";cin>>idTargetServer;
             targetServer = searchServer(idTargetServer, actualServer, list);
-            bellmanFord(actualServer, targetServer);
+            bellmanFord(list, targetServer);
             break;
         case 3: 
+            //Cambiar servidor
             int searchID;
             cout<<"Ingress server ID: ";cin>>searchID;
             actualServer = searchServer(searchID, actualServer, list);
             
             break;
+            //salir
         case 0: break;
         }
     }while(option != 0);
 };
 
 
+//Main
 int main(){
     vector<Server> serverList;
     serverList = generateConnections(serverList);
