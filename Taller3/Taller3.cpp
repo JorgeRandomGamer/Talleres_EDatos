@@ -91,24 +91,39 @@ vector<Server> generateConnections(vector<Server> list){
     return list;
 };
 
-void bellmanFord(vector<Server*> servers, Server* origin){
-    vector<pair<Server*, pair<Server*,int>>> distancias;
-    for(Server* s : servers){
-        if(s == origin){
+void bellmanFord(vector<Server> servers, Server origin){
+    vector<pair<Server, pair<Server,int>>> distancias;
+    cout<<"server: "<<origin.name<<"to ";
+    for(Server s : servers){
+        if(s.id == origin.id){
             distancias.push_back(make_pair(origin, make_pair(origin, 0)));
         } else {
             int max =INT_MAX;
-            distancias.push_back(make_pair(s, make_pair(origin, max)));
+            distancias.push_back(make_pair(s, make_pair(origin, max))); 
         }
     }
 };
 
+Server searchServer(int id, Server server, vector<Server> list){
+    for(Server s : list){
+        if(id == stoi(s.id)){
+            server = s;
+            break;
+        }
+    }
+    return server;
+};
+
 void menu(vector<Server> list){
     int option;
+    Server actualServer = list[0];
+    Server targetServer;
     do{
+        cout<<"Actual Server: "<<actualServer.name<<endl;
         cout<<"\n\tMenu\n";
         cout<<"\n1) View Servers"<<endl;
         cout<<"2) Send files"<<endl;
+        cout<<"3) Change Server"<<endl;
         cout<<"0) Close app"<<endl;
         cout<<"\nInsert option: ";cin>>option;
         
@@ -118,12 +133,25 @@ void menu(vector<Server> list){
                 cout<<"Id: "<<s.id<<", Name: "<<s.name<<", Type: "<<s.type<<endl;
                 cout<<"Connections: {";
                 for(pair<Server, pair<int,int>> con : s.connections){
-                    cout<<" - "<<con.first.name<<", Speed: "<<con.second.first<<", Distance: "<<con.second.second;
+                    cout<<" - "<<con.first.name<<", Speed: "<<con.second.first<<", Distance: "<<con.second.second   ;
                 }
                 cout<<"}"<<endl;
             }
             break;
-        case 2: break;
+        case 2: 
+            int size;
+            int idTargetServer;
+            cout<<"Set the size: ";cin>>size;
+            cout<<"Set the target ID to send the file: ";cin>>idTargetServer;
+            targetServer = searchServer(idTargetServer, actualServer, list);
+            bellmanFord(actualServer, targetServer);
+            break;
+        case 3: 
+            int searchID;
+            cout<<"Ingress server ID: ";cin>>searchID;
+            actualServer = searchServer(searchID, actualServer, list);
+            
+            break;
         case 0: break;
         }
     }while(option != 0);
@@ -133,7 +161,7 @@ void menu(vector<Server> list){
 int main(){
     vector<Server> serverList;
     serverList = generateConnections(serverList);
-    menu(serverList);
+    menu(serverList);   
 
     return 0;
 }
