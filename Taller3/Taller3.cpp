@@ -125,21 +125,6 @@ void bellmanFord(vector<Server*> lista, Server* origen) {
     }
 };
 
-
-void enviarMensaje(Server* server, Server* objetivo){
-    for(pair<Server*, pair<int,int>> con : server->conexiones){
-        if(con.first->tipo == "router"){
-            cout<<con.first->nombre<<endl;
-            for(pair<Server*, pair<int,int>> con2 : objetivo->conexiones){
-                if(con2.first->id == con.first->id){
-                    cout<<"Mensaje enviado a traves de "<<con.first->nombre<<endl;
-                    
-                }
-            }
-        }
-    }
-};
-
 void menu(vector<Server*> listaGeneral){
     //Menu
     int opcion;
