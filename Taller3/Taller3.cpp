@@ -3,6 +3,7 @@
 #include <sstream>
 #include <vector>
 #include <limits>
+#include <queue>
 
 using namespace std;
 
@@ -105,37 +106,40 @@ vector<Server*> generarConexiones(vector<Server*> listaGeneral){
     return listaGeneral;
 };
 
-float sumarDistancia(Server* origen, Server* objetivo, int distancia){
-
-    for(pair<Server*, pair<int,int>> con : origen->conexiones){
-        if(con.first->id == objetivo->id){
-            distancia += con.second.second/con.second.first;
-            return distancia;
-        }
-    }
-    cout<<"No encontró el objetivo"<<endl;
-
-    if(distancia == 0){
-        for(pair<Server*, pair<int,int>> con : origen->conexiones){
-            cout<<con.first->nombre<<endl;  
-            if(con.first->tipo == "router"){
-                distancia += con.second.second/con.second.first;
-                sumarDistancia(con.first, objetivo, distancia);
+int encontrarCamino(Server* origen, Server* objetivo, int distancia){
+    //Funcion para calcular distancias entre servidores
+    if(origen == objetivo){
+        return distancia;
+    }else{
+        if (objetivo->tipo == "router") {
+            for(pair<Server*, pair<int,int>> con : origen->conexiones){
+                if(con.first->id == objetivo->id){
+                    distancia += con.second.second/con.second.first;
+                    break;
+                }
             }
-        }    
+        } else {
+            for(pair<Server*, pair<int,int>> con : origen->conexiones){
+                if(con.first->tipo == "router"){
+                    encontrarCamino(con.first, objetivo, con.second.second/con.second.first);
+                }
+            }
+        }
+        return distancia;
     }
-    return distancia;
 };
 
 vector<pair<Server*, pair<Server*,int>>> bellmanFord(vector<Server*> servers, Server* origen){
     //Algoritmo bellmanFord
+
     vector<pair<Server*, pair<Server*,int>>> distancias;
+
     cout<< origen->nombre << endl;
     for(Server* s : servers){
         if(s->id == origen->id){
             distancias.push_back(make_pair(origen, make_pair(origen, 0)));
-        }else{
-            int dist = sumarDistancia(origen, s, 0);
+        }else{  
+            int dist = encontrarCamino(origen, s, 0);
             distancias.push_back(make_pair(s, make_pair(origen, dist)));
         }
     }
