@@ -3,37 +3,17 @@
 #include <sstream>
 #include <vector>
 #include <limits>
+#include <stack>
 
 using namespace std;
-
-/*
-El usuario de la plataforma debe entregar el peso del archivo que desea enviar.
-Por ejemplo, si desde el cliente con id 0 deseo enviar un archivo de 1200 mb, 
-entonces el archivo debe ser particionado en 4 partes, debido a que la conexión 
-solo acepta 300 mb como máximo.
-
-La distancia también afecta el tiempo de conexión, ya que entrega la
-información de cuantos segundos se demora en enviar un archivo.
-
-Si la misma persona desea enviar el archivo de 1200 mb, entonces debe dividirse 
-en 4 partes, cada parte se demora 1 segundo en generar la conexión con el router
-con id 10, por lo tanto, solo para que el archivo completo llegue al router, se 
-demorara un tiempo total de 4 segundos.
-
-Usuario además tiene que ser capaz de conocer la ruta que esta tomando el
-archivo y conocer los tiempos entre cada nodo que se comunica.
-*/
-
-//Arreglar print
-//Controlar ciclo infinito
-//Dividir en partes
 
 struct Server{
     //Estructura del server
     string id,nombre,tipo;
-    vector<pair<Server*,pair<int,int>>> conexiones;
-    int distancia, velocidad;
+    vector<pair<Server*,pair<double,double>>> conexiones;
+    double distancia, velocidad;
 };
+
 const int distanciaMax = 10000000;
 
 vector<Server*> leerArchivo(string nombreArchivo){
@@ -79,8 +59,8 @@ void generarConexiones(vector<Server*> listaGeneral) {
         getline(ss, speed, ',');
         getline(ss, distance, ',');
         
-        int sp = stoi(speed);
-        int dist = stoi(distance);
+        double sp = stod(speed);
+        double dist = stod(distance);
 
         for (Server* s : listaGeneral) {
             if (s->id == idClient) {
@@ -100,7 +80,7 @@ void generarConexiones(vector<Server*> listaGeneral) {
     file.close();
 };
 
-void bellmanFord(vector<Server*> lista, Server* origen) {
+void bellmanFord(vector<Server*> lista, Server* origen,Server* objetivo, stack<Server*> camino) {
     for (Server* s : lista) {
         if(s == origen){
             s->distancia = 0;
@@ -112,14 +92,29 @@ void bellmanFord(vector<Server*> lista, Server* origen) {
 
     for (int i = 0; i < lista.size() - 1; i++) {
         for (Server* s : lista) {
-            for (pair<Server*, pair<int,int>> con : s->conexiones) {
-                int distanciaAcumulada = s->distancia + con.second.second; // Distancia acumulada
-                int velocidadAcumulada = s->velocidad + con.second.first;   // Velocidad acumulada
+            for (pair<Server*, pair<double,double>> con : s->conexiones) {
+                // Calcular nuevas distancias y velocidades acumuladas
+                double distanciaAcumulada = s->distancia + con.second.second; // Distancia acumulada
+                double velocidadAcumulada = s->velocidad + con.second.first;   // Velocidad acumulada
 
+                // Actualizar si se encuentra una ruta más corta
                 if (distanciaAcumulada < con.first->distancia || (distanciaAcumulada == con.first->distancia && velocidadAcumulada > con.first->velocidad)) {
                     con.first->distancia = distanciaAcumulada;
                     con.first->velocidad = velocidadAcumulada;
                 }
+            }
+        }
+    }
+
+    Server* actual = objetivo;
+    camino.push(actual);
+
+    while (actual != origen) {
+        for (pair<Server*, pair<double,double>> con : actual->conexiones) {
+            if (con.first->distancia + con.second.second == actual->distancia && con.first->velocidad + con.second.first == actual->velocidad) {
+                actual = con.first;
+                camino.push(actual);
+                break;
             }
         }
     }
@@ -130,6 +125,8 @@ void menu(vector<Server*> listaGeneral){
     int opcion;
     Server* serverActual = listaGeneral[0];
     Server* serverObjetivo;
+    stack<Server*> camino;
+    stack<Server*> aux; 
 
     do{
         cout << "Servidor Actual: " << serverActual->nombre <<endl;
@@ -147,7 +144,7 @@ void menu(vector<Server*> listaGeneral){
             for (Server* s : listaGeneral) {
                 cout << "Id: " << s->id << ", Nombre: " << s->nombre << ", Tipo: "<<s->tipo << endl;
                 cout << "Conexiones: {";
-                for (pair<Server*, pair<int,int>> con : s->conexiones) {
+                for (pair<Server*, pair<double,double>> con : s->conexiones) {
                     cout << con.first->nombre << ", Velocidad: " << con.second.first << ", Distancia: " << con.second.second << " ";
                 }
                 cout << "}" << endl;
@@ -168,11 +165,20 @@ void menu(vector<Server*> listaGeneral){
                 }
             }
             if (serverObjetivo != nullptr) {
-                bellmanFord(listaGeneral, serverActual);
+                bellmanFord(listaGeneral, serverActual, serverObjetivo, camino);
                 if (serverObjetivo->distancia == distanciaMax) {
                     cout << "No hay conexion entre el servidor actual y el servidor objetivo." << endl;
                 } else {
-                    cout << "Tiempo estimado de envio: " << serverObjetivo->distancia << " segundos" << endl;
+                    while(!camino.empty()){
+                        aux.push(camino.top());
+                        camino.pop();
+                    }
+                    while(!aux.empty()){
+                        cout<<aux.top()->nombre<<", ";
+                        aux.pop();
+                    }
+                
+                    cout << "Tiempo estimado de envio: " << (tamano/serverObjetivo->velocidad)*serverObjetivo->distancia << " segundos" << endl;
                 }            
             } else {
                 cout << "Destinatrio no encontrado." << endl;
