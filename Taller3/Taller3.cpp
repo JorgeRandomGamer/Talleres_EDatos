@@ -34,17 +34,16 @@ struct Server{
     vector<pair<Server*,pair<int,int>>> conexiones;
     int distancia, velocidad;
 };
+const int distanciaMax = 10000000;
 
 vector<Server*> leerArchivo(string nombreArchivo){
     //Leer archivos
-    
     vector<Server*> listaGeneral;
     ifstream file(nombreArchivo);
     if(!file){
         cout << "El archivo '" + nombreArchivo + "' no pudo abrirse" <<endl;
         return listaGeneral;
     }
-
     string linea; 
     getline(file, linea);
 
@@ -103,22 +102,23 @@ void generarConexiones(vector<Server*> listaGeneral) {
 
 void bellmanFord(vector<Server*> lista, Server* origen) {
     for (Server* s : lista) {
-        s->distancia = numeric_limits<int>::max();
+        if(s == origen){
+            s->distancia = 0;
+        }else{
+            s->distancia = distanciaMax;
+        }
         s->velocidad = 0;
     }
-
-    origen->distancia = 0;
-    origen->velocidad = 0;
 
     for (int i = 0; i < lista.size() - 1; i++) {
         for (Server* s : lista) {
             for (pair<Server*, pair<int,int>> con : s->conexiones) {
-                int altDistancia = s->distancia + con.second.second; // Distancia acumulada
-                int altVelocidad = s->velocidad + con.second.first;   // Velocidad acumulada
+                int distanciaAcumulada = s->distancia + con.second.second; // Distancia acumulada
+                int velocidadAcumulada = s->velocidad + con.second.first;   // Velocidad acumulada
 
-                if (altDistancia < con.first->distancia || (altDistancia == con.first->distancia && altVelocidad > con.first->velocidad)) {
-                    con.first->distancia = altDistancia;
-                    con.first->velocidad = altVelocidad;
+                if (distanciaAcumulada < con.first->distancia || (distanciaAcumulada == con.first->distancia && velocidadAcumulada > con.first->velocidad)) {
+                    con.first->distancia = distanciaAcumulada;
+                    con.first->velocidad = velocidadAcumulada;
                 }
             }
         }
@@ -169,7 +169,11 @@ void menu(vector<Server*> listaGeneral){
             }
             if (serverObjetivo != nullptr) {
                 bellmanFord(listaGeneral, serverActual);
-                cout << "Tiempo de envio: " << serverObjetivo->distancia << " segundos" << endl;
+                if (serverObjetivo->distancia == distanciaMax) {
+                    cout << "No hay conexion entre el servidor actual y el servidor objetivo." << endl;
+                } else {
+                    cout << "Tiempo estimado de envio: " << serverObjetivo->distancia << " segundos" << endl;
+                }            
             } else {
                 cout << "Destinatrio no encontrado." << endl;
             }
