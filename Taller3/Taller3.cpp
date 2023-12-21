@@ -30,49 +30,53 @@ archivo y conocer los tiempos entre cada nodo que se comunica.
 
 struct Server{
     //Estructura del server
-    string id,name,type;
-    vector<pair<Server,pair<int,int>>> connections;
+    string id,nombre,tipo;
+    vector<pair<Server*,pair<int,int>>> conexiones;
 };
 
-vector<Server> readCsv(string nameScv){
+vector<Server*> leerArchivo(string nombreArchivo){
     //Leer archivos
-    vector<Server> serverList;
-    ifstream file(nameScv);
+    
+    vector<Server*> listaGeneral;
+    ifstream file(nombreArchivo);
     if(!file){
-        cout<<"the file "+nameScv+" hasn't opened"<<endl;
-        return serverList;
+        cout<<"El archivo '"+nombreArchivo+"' no pudo abrirse"<<endl;
+        return listaGeneral;
     }
-    string line; 
+    string linea; 
 
-    getline(file, line);
-    while(getline(file, line)){
+    getline(file, linea);
 
-        stringstream ss(line);
-        Server s;
+    while(getline(file, linea)){
 
-        getline(ss, s.id, ',');
-        getline(ss, s.name, ',');
-        getline(ss, s.type, ',');
+        stringstream ss(linea);
+        Server *s = new Server;
+        getline(ss, s->id, ',');
+        getline(ss, s->nombre, ',');
+        getline(ss, s->tipo, ',');
 
-        serverList.push_back(s);
+        listaGeneral.push_back(s);
+
     }
     file.close();
-    return serverList;
+    return listaGeneral;
 };
 
-vector<Server> generateConnections(vector<Server> list){
+vector<Server*> generarConexiones(vector<Server*> listaGeneral){
     //Generar conexiones 
-    list = readCsv("servidores.csv");
+    listaGeneral = leerArchivo("servidores.csv");
     ifstream file("conexiones.csv");
     if(!file){
-        cout<<"the file 'conexiones.csv' hasn't opened"<<endl;
-        return list;
+        cout<<"El archivo 'conexiones.csv' no pudo abrirse"<<endl;
+        return listaGeneral;
     }
-    string line; 
-    getline(file, line);
-    while(getline(file, line)){
+    
+    string linea; 
+    getline(file, linea);
+    
+    while(getline(file, linea)){
 
-        stringstream ss(line);
+        stringstream ss(linea);
         string idClient, idServer, speed, distance;
         getline(ss, idClient, ',');
         getline(ss, idServer, ',');
@@ -82,11 +86,14 @@ vector<Server> generateConnections(vector<Server> list){
         int sp = stoi(speed);
         int dist = stoi(distance);
 
-        for (Server &s : list) {
-            if (s.id == idClient) {
-                for (Server &s2 : list) {
-                    if (s2.id == idServer) {
-                        s.connections.push_back(make_pair(s2, make_pair(sp, dist)));
+        for (Server* s : listaGeneral) {
+            if (s->id == idClient) {
+                for (Server* s2 : listaGeneral) {
+                    if (s2->id == idServer) {
+                        s->conexiones.push_back(make_pair(s2, make_pair(sp, dist)));
+                        if(s2->tipo == "router"){
+                            s2->conexiones.push_back(make_pair(s, make_pair(sp, dist)));
+                        }
                         break;
                     }
                 }
@@ -95,27 +102,50 @@ vector<Server> generateConnections(vector<Server> list){
         }
     }
     file.close();
-    return list;
+    return listaGeneral;
 };
 
-void bellmanFord(vector<Server> servers, Server origin){
-    //Algoritmo bellmanFord
-    vector<pair<Server, pair<Server,int>>> distancias;
-    cout<<"server: "<< origin.name << " " << " to ";
-    for(Server s : servers){
-        if(s.id == origin.id){
-            distancias.push_back(make_pair(origin, make_pair(origin, 0)));
-        } else {
-            int max =INT_MAX;
-            distancias.push_back(make_pair(s, make_pair(origin, max))); 
+float sumarDistancia(Server* origen, Server* objetivo, int distancia){
+
+    for(pair<Server*, pair<int,int>> con : origen->conexiones){
+        if(con.first->id == objetivo->id){
+            distancia += con.second.second/con.second.first;
+            return distancia;
         }
     }
+    cout<<"No encontró el objetivo"<<endl;
+
+    if(distancia == 0){
+        for(pair<Server*, pair<int,int>> con : origen->conexiones){
+            cout<<con.first->nombre<<endl;  
+            if(con.first->tipo == "router"){
+                distancia += con.second.second/con.second.first;
+                sumarDistancia(con.first, objetivo, distancia);
+            }
+        }    
+    }
+    return distancia;
 };
 
-Server searchServer(int id, Server server, vector<Server> list){
+vector<pair<Server*, pair<Server*,int>>> bellmanFord(vector<Server*> servers, Server* origen){
+    //Algoritmo bellmanFord
+    vector<pair<Server*, pair<Server*,int>>> distancias;
+    cout<< origen->nombre << endl;
+    for(Server* s : servers){
+        if(s->id == origen->id){
+            distancias.push_back(make_pair(origen, make_pair(origen, 0)));
+        }else{
+            int dist = sumarDistancia(origen, s, 0);
+            distancias.push_back(make_pair(s, make_pair(origen, dist)));
+        }
+    }
+    return distancias;
+};
+
+Server* cambiarServidor(int id, Server* server, vector<Server*> listaGeneral){
     //Funcion para buscar servers
-    for(Server s : list){
-        if(id == stoi(s.id)){
+    for(Server* s : listaGeneral){
+        if(id == stoi(s->id)){
             server = s;
             break;
         }
@@ -123,46 +153,46 @@ Server searchServer(int id, Server server, vector<Server> list){
     return server;
 };
 
-void menu(vector<Server> list){
+void menu(vector<Server*> listaGeneral){
     //Menu
     int option;
-    Server actualServer = list[0];
-    Server targetServer;
+    Server* serverActual = listaGeneral[0];
+    vector<pair<Server*, pair<Server*,int>>> distancias;
+
     do{
-        cout<<"Actual Server: "<<actualServer.name<<endl;
+        cout<<"Servidor Actual: "<<serverActual->nombre<<endl;
         cout<<"\n\tMenu\n";
-        cout<<"\n1) View Servers"<<endl;
-        cout<<"2) Send files"<<endl;
-        cout<<"3) Change Server"<<endl;
-        cout<<"0) Close app"<<endl;
-        cout<<"\nInsert option: ";cin>>option;
+        cout<<"\n1) Ver Servidores"<<endl;
+        cout<<"2) Enviar archivo"<<endl;
+        cout<<"3) Cambiar Servidor"<<endl;
+        cout<<"0) Salir"<<endl;
+        cout<<"\nSeleccione opcion: ";cin>>option;
         
         switch (option){
         case 1: 
             //Opcion ver los servers
-            for(Server s : list){
-                cout<<"Id: "<<s.id<<", Name: "<<s.name<<", Type: "<<s.type<<endl;
+            for(Server* s : listaGeneral){
+                cout<<"Id: "<<s->id<<", nombre: "<<s->nombre<<", Type: "<<s->tipo<<endl;
                 cout<<"Connections: {";
-                for(pair<Server, pair<int,int>> con : s.connections){
-                    cout<<" - "<<con.first.name<<", Speed: "<<con.second.first<<", Distance: "<<con.second.second   ;
+                for(pair<Server*, pair<int,int>> con : s->conexiones){
+                    cout<<" - "<<con.first->nombre<<", Speed: "<<con.second.first<<", Distance: "<<con.second.second;
                 }
                 cout<<"}"<<endl;
             }
             break;
         case 2: 
-            //Mandar archivos
-            int size;
-            int idTargetServer;
-            cout<<"Set the size: ";cin>>size;
-            cout<<"Set the target ID to send the file: ";cin>>idTargetServer;
-            targetServer = searchServer(idTargetServer, actualServer, list);
-            bellmanFord(list, targetServer);
+            //Enviar archivos
+            int tamano;
+            int idServerObjetivo;
+            cout<<"Ingrese el tamano del archivo: ";cin>>tamano;
+            cout<<"Ingrese la ID del server al cual enviara el arhivo: ";cin>>idServerObjetivo;
             break;
         case 3: 
             //Cambiar servidor
             int searchID;
             cout<<"Ingress server ID: ";cin>>searchID;
-            actualServer = searchServer(searchID, actualServer, list);
+            serverActual = cambiarServidor(searchID, serverActual, listaGeneral);
+            distancias = bellmanFord(listaGeneral, serverActual);
             
             break;
             //salir
@@ -174,9 +204,9 @@ void menu(vector<Server> list){
 
 //Main
 int main(){
-    vector<Server> serverList;
-    serverList = generateConnections(serverList);
-    menu(serverList);   
+    vector<Server*> listaGeneral;
+    listaGeneral = generarConexiones(listaGeneral);
+    menu(listaGeneral);   
 
     return 0;
 }
