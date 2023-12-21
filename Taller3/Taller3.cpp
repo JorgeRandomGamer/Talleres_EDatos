@@ -107,17 +107,22 @@ void bellmanFord(vector<Server*> lista, Server* origen,Server* objetivo, stack<S
     }
 
     Server* actual = objetivo;
-    camino.push(actual);
 
     while (actual != origen) {
         for (pair<Server*, pair<double,double>> con : actual->conexiones) {
             if (con.first->distancia + con.second.second == actual->distancia && con.first->velocidad + con.second.first == actual->velocidad) {
-                actual = con.first;
                 camino.push(actual);
-                break;
+                actual = con.first;
             }
         }
     }
+    camino.push(actual);
+
+    while(!camino.empty()){
+        cout<<camino.top()->nombre<<", ";
+        camino.pop();
+    }
+    cout<<endl;
 };
 
 void menu(vector<Server*> listaGeneral){
@@ -126,7 +131,8 @@ void menu(vector<Server*> listaGeneral){
     Server* serverActual = listaGeneral[0];
     Server* serverObjetivo;
     stack<Server*> camino;
-    stack<Server*> aux; 
+    stack<Server*> aux;
+
 
     do{
         cout << "Servidor Actual: " << serverActual->nombre <<endl;
@@ -169,15 +175,6 @@ void menu(vector<Server*> listaGeneral){
                 if (serverObjetivo->distancia == distanciaMax) {
                     cout << "No hay conexion entre el servidor actual y el servidor objetivo." << endl;
                 } else {
-                    while(!camino.empty()){
-                        aux.push(camino.top());
-                        camino.pop();
-                    }
-                    while(!aux.empty()){
-                        cout<<aux.top()->nombre<<", ";
-                        aux.pop();
-                    }
-                
                     cout << "Tiempo estimado de envio: " << (tamano/serverObjetivo->velocidad)*serverObjetivo->distancia << " segundos" << endl;
                 }            
             } else {
