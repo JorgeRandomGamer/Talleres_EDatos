@@ -10,7 +10,7 @@ using namespace std;
 struct Server{
     //Estructura del server
     string id,nombre,tipo;
-    vector<pair<Server*,pair<double,double>>> conexiones;
+    vector<pair<Server*,pair<int,double>>> conexiones;
     double distancia, velocidad;
 };
 
@@ -128,7 +128,11 @@ void bellmanFord(vector<Server*> lista, Server* origen,Server* objetivo, stack<S
 void menu(vector<Server*> listaGeneral){
     //Menu
     int opcion;
-    Server* serverActual = listaGeneral[0];
+    int n = 0;
+    Server* serverActual = listaGeneral[n];
+    if(serverActual->tipo == "router"){
+        serverActual = listaGeneral[n+1];
+    }
     Server* serverObjetivo;
     stack<Server*> camino;
     stack<Server*> aux;
@@ -166,7 +170,11 @@ void menu(vector<Server*> listaGeneral){
             serverObjetivo = nullptr;
             for (Server* s : listaGeneral) {
                 if (idServerObjetivo == stoi(s->id)) {
-                    serverObjetivo = s;
+                    if(s->tipo == "router"){
+                        cout<<"Seleccione un cliente valido"<<endl;
+                    }else{
+                        serverObjetivo = s; 
+                    }
                     break;
                 }
             }
