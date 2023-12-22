@@ -139,29 +139,26 @@ void menu(vector<Server*> listaGeneral){
 
 
     do{
-        cout << "Servidor Actual: " << serverActual->nombre <<endl;
-        cout << "\n\tMenu\n";
-        cout << "\n1) Ver Servidores" << endl;
-        cout << "2) Enviar archivo" << endl;
-        cout << "3) Cambiar Servidor" << endl;
+        cout << "Usuario Actual: " << serverActual->nombre <<endl;
+        cout << "\n\tMyMessageApp\n";
+        cout << "\n1) Ver Contactos" << endl;
+        cout << "2) Enviar Mensaje" << endl;
+        cout << "3) Cambiar Usuario" << endl;
         cout << "0) Salir" << endl;
         cout << "\nSeleccione opcion: ";
         cin >> opcion;
         
         switch (opcion){
         case 1: 
-            //Opcion ver los servers
+            //Ver los servers clientes
             for (Server* s : listaGeneral) {
-                cout << "Id: " << s->id << ", Nombre: " << s->nombre << ", Tipo: "<<s->tipo << endl;
-                cout << "Conexiones: {";
-                for (pair<Server*, pair<double,double>> con : s->conexiones) {
-                    cout << con.first->nombre << ", Velocidad: " << con.second.first << ", Distancia: " << con.second.second << " ";
+                if(s->tipo != "router"){
+                    cout << "Id: " << s->id << ", Nombre: " << s->nombre << endl;
                 }
-                cout << "}" << endl;
             }
             break;
         case 2: 
-            //Enviar archivos
+            //Enviar Mensaje
             int tamano, idServerObjetivo;
             cout << "Ingrese el tamano del archivo: ";
             cin >> tamano;
@@ -194,10 +191,13 @@ void menu(vector<Server*> listaGeneral){
             int idBuscada;
             cout << "Ingrese la ID del servidor al cual cambiar: ";
             cin >> idBuscada;
-            serverActual = nullptr;
             for(Server* s : listaGeneral){
                 if(idBuscada == stoi(s->id)){
-                    serverActual = s;
+                    if(s->tipo == "router"){
+                        cout<<"Seleccione un cliente valido"<<endl;
+                    }else{
+                        serverActual = s; 
+                    }
                     break;
                 }
             }
@@ -205,8 +205,10 @@ void menu(vector<Server*> listaGeneral){
                 cout << "Servidor no encontrado." << endl;
             }
             break;
-        case 0: break; //salir
-        default: cout << "Opción no válida. Inténtelo de nuevo." << endl;
+        case 0: 
+            break; //salir
+        default: 
+            cout << "Opción no válida. Inténtelo de nuevo." << endl;
         }
     }while(opcion != 0);
 };
