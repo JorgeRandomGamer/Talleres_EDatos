@@ -1,5 +1,5 @@
 Integrantes:
-Francisco Astudillo Rivera
+Francisco Astudillo Rivera Y
 Jorge Bustos Álvarez
 
 int distanciaMax -> constante para represtentar la distancia infinita entre vertices que no tengan aristas que los unan
