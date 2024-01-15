@@ -1,4 +1,6 @@
-# Talleres_EDatos
+# Talleres_Estructura_de_Datos
+
+#Talleres realizados en Universidad en C++
 
 Taller1 -> carpeta para archivos del taller n°1, en consola usar el comando -pushd Taller1 para acceder a esta carpeta
 Para ejecutar el programa principal se ocupará el comando "g++ -o main main.cpp"
